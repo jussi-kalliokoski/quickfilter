@@ -1,0 +1,15 @@
+language: go
+sudo: false
+
+matrix:
+- go: 1.x
+  env: LATEST=true
+
+install:
+- # skip
+
+script:
+- go get -t -v ./...
+- diff -u <(echo -n) <(gofmt -d .)
+- if [[ "$LATEST" = true ]]; then go vet .; fi
+- go test -v -race ./...
