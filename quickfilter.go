@@ -53,6 +53,14 @@ func New(sourceLen int) QuickFilter {
 	}
 }
 
+// NewFilled returns a new QuickFilter, like New, but instead of all items
+// being left out by default, all are included in the filter result. This
+// allows for doing multi-level filtering where the results from one filter
+// function are passed to the next as a QuickFilter.
+func NewFilled(sourceLen int) QuickFilter {
+	return New(sourceLen).Fill()
+}
+
 // Add an index to the offset list.
 //
 // The original QuickFilter is no longer usable and must be replaced with the
@@ -68,6 +76,40 @@ func (qf QuickFilter) Add(index int) QuickFilter {
 // Len returns the number of offsets stored.
 func (qf QuickFilter) Len() int {
 	return qf.len
+}
+
+// Clear the entries in the QuickFilter.
+//
+// The original QuickFilter is no longer usable and must be replaced with the
+// returned one. This approach prevents the QuickFilter from escaping to the
+// heap.
+func (qf QuickFilter) Clear() QuickFilter {
+	for i := range qf.bits {
+		qf.bits[i] = 0
+	}
+	qf.len = 0
+	return qf
+}
+
+// Fill the QuickFilter to contain all the entries in the source slice.
+//
+// The original QuickFilter is no longer usable and must be replaced with the
+// returned one. This approach prevents the QuickFilter from escaping to the
+// heap.
+func (qf QuickFilter) Fill() QuickFilter {
+	for i := 0; i < len(qf.bits); i++ {
+		qf.bits[i] = ^uint(0)
+	}
+	qf.len = qf.sourceLen
+	return qf
+}
+
+// Copy a QuickFilter with its results to a new QuickFilter.
+func (qf QuickFilter) Copy() QuickFilter {
+	qf2 := New(qf.sourceLen)
+	copy(qf2.bits, qf.bits)
+	qf2.len = qf.len
+	return qf2
 }
 
 // Iterate over the stored offsets.

@@ -3,18 +3,78 @@ package quickfilter
 import "testing"
 
 func Test(t *testing.T) {
-	data := generateData(20)
-	qf := New(len(data))
-	for i := range data {
-		if data[i].index%2 == 0 {
-			qf = qf.Add(i)
+	t.Run("Add and Iterate", func(t *testing.T) {
+		data := generateData(20)
+		qf := New(len(data))
+
+		for i := range data {
+			if data[i].index%2 == 0 {
+				qf = qf.Add(i)
+			}
 		}
-	}
-	newData := make([]mockData, 0, qf.Len())
-	for it := qf.Iterate(); !it.Done(); it = it.Next() {
-		newData = append(newData, data[it.Value()])
-	}
-	validate(t, len(data), newData)
+		newData := make([]mockData, 0, qf.Len())
+		for it := qf.Iterate(); !it.Done(); it = it.Next() {
+			newData = append(newData, data[it.Value()])
+		}
+
+		validate(t, len(data), newData)
+	})
+
+	t.Run("Fill and Iterate", func(t *testing.T) {
+		data := generateData(20)
+		qf := New(len(data))
+		expectedLen := len(data)
+
+		qf = qf.Fill()
+		newData := make([]mockData, 0, qf.Len())
+		for it := qf.Iterate(); !it.Done(); it = it.Next() {
+			newData = append(newData, data[it.Value()])
+		}
+		receivedLen := len(newData)
+
+		if expectedLen != receivedLen {
+			t.Errorf("expected %d, got %d", expectedLen, receivedLen)
+		}
+	})
+
+	t.Run("Clear and Iterate", func(t *testing.T) {
+		data := generateData(20)
+		qf := New(len(data))
+		expectedLen := 0
+
+		for i := range data {
+			if data[i].index%2 == 0 {
+				qf = qf.Add(i)
+			}
+		}
+		qf = qf.Clear()
+		newData := make([]mockData, 0, qf.Len())
+		for it := qf.Iterate(); !it.Done(); it = it.Next() {
+			newData = append(newData, data[it.Value()])
+		}
+		receivedLen := len(newData)
+
+		if expectedLen != receivedLen {
+			t.Errorf("expected %d, got %d", expectedLen, receivedLen)
+		}
+	})
+
+	t.Run("Fill and Copy", func(t *testing.T) {
+		data := generateData(20)
+		qf := NewFilled(len(data))
+		expectedLen := len(data)
+
+		qf2 := qf.Copy()
+		newData := make([]mockData, 0, qf.Len())
+		for it := qf2.Iterate(); !it.Done(); it = it.Next() {
+			newData = append(newData, data[it.Value()])
+		}
+		receivedLen := len(newData)
+
+		if expectedLen != receivedLen {
+			t.Errorf("expected %d, got %d", expectedLen, receivedLen)
+		}
+	})
 }
 
 func Example() {
