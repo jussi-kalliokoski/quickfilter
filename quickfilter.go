@@ -29,7 +29,7 @@
 package quickfilter
 
 import (
-	"strconv"
+	"math/bits"
 )
 
 // QuickFilter is a utility module that stores offsets and allows you to
@@ -112,6 +112,27 @@ func (qf QuickFilter) Copy() QuickFilter {
 	return qf2
 }
 
+// UnionOf fills the QuickFilter with the set values in one or both of the
+// provided QuickFilters.
+//
+// The receiver and passed QuickFilters must all be the same size or this will
+// panic.
+//
+// The original QuickFilter is no longer usable and must be replaced with the
+// returned one. This approach prevents the QuickFilter from escaping to the
+// heap.
+func (qf QuickFilter) UnionOf(qf1, qf2 QuickFilter) QuickFilter {
+	if len(qf.bits) != len(qf1.bits) || len(qf.bits) != len(qf2.bits) {
+		panic("receiver and passed QuickFilters must be the same size")
+	}
+	qf.len = 0
+	for i := range qf.bits {
+		qf.bits[i] = qf1.bits[i] | qf2.bits[i]
+		qf.len += bits.OnesCount(qf.bits[i])
+	}
+	return qf
+}
+
 // Iterate over the stored offsets.
 func (qf QuickFilter) Iterate() Iterator {
 	return Iterator{
@@ -152,5 +173,5 @@ func (it Iterator) Value() int {
 }
 
 func offsets(pos int) (index int, mask uint) {
-	return pos / strconv.IntSize, 1 << (uint(pos) % strconv.IntSize)
+	return pos / bits.UintSize, 1 << (uint(pos) % bits.UintSize)
 }
