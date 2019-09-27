@@ -1,6 +1,7 @@
 package quickfilter_test
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/jussi-kalliokoski/quickfilter"
@@ -82,7 +83,10 @@ func Test(t *testing.T) {
 }
 
 func Example() {
-	var data []int
+	data := make([]int, 0, 8)
+	for len(data) < cap(data) {
+		data = append(data, len(data))
+	}
 	qf := quickfilter.New(len(data))
 	for i := range data {
 		if data[i]%2 == 0 {
@@ -93,6 +97,8 @@ func Example() {
 	for it := qf.Iterate(); !it.Done(); it = it.Next() {
 		newData = append(newData, data[it.Value()])
 	}
+	// Output: [0 2 4 6]
+	fmt.Println(newData)
 }
 
 func Benchmark(b *testing.B) {
@@ -176,6 +182,7 @@ func generateData(dataLen int) []mockData {
 	data := make([]mockData, 0, dataLen)
 	for i := 0; i < dataLen; i++ {
 		data = append(data, mockData{index: i})
+		_ = data[i].trash
 	}
 	return data
 }
