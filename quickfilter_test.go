@@ -1,11 +1,15 @@
-package quickfilter
+package quickfilter_test
 
-import "testing"
+import (
+	"testing"
+
+	"github.com/jussi-kalliokoski/quickfilter"
+)
 
 func Test(t *testing.T) {
 	t.Run("Add and Iterate", func(t *testing.T) {
 		data := generateData(20)
-		qf := New(len(data))
+		qf := quickfilter.New(len(data))
 
 		for i := range data {
 			if data[i].index%2 == 0 {
@@ -22,7 +26,7 @@ func Test(t *testing.T) {
 
 	t.Run("Fill and Iterate", func(t *testing.T) {
 		data := generateData(20)
-		qf := New(len(data))
+		qf := quickfilter.New(len(data))
 		expectedLen := len(data)
 
 		qf = qf.Fill()
@@ -39,7 +43,7 @@ func Test(t *testing.T) {
 
 	t.Run("Clear and Iterate", func(t *testing.T) {
 		data := generateData(20)
-		qf := New(len(data))
+		qf := quickfilter.New(len(data))
 		expectedLen := 0
 
 		for i := range data {
@@ -61,7 +65,7 @@ func Test(t *testing.T) {
 
 	t.Run("Fill and Copy", func(t *testing.T) {
 		data := generateData(20)
-		qf := NewFilled(len(data))
+		qf := quickfilter.NewFilled(len(data))
 		expectedLen := len(data)
 
 		qf2 := qf.Copy()
@@ -79,7 +83,7 @@ func Test(t *testing.T) {
 
 func Example() {
 	var data []int
-	qf := New(len(data))
+	qf := quickfilter.New(len(data))
 	for i := range data {
 		if data[i]%2 == 0 {
 			qf = qf.Add(i)
@@ -98,7 +102,7 @@ func Benchmark(b *testing.B) {
 		b.ReportAllocs()
 		for n := 0; n < b.N; n++ {
 			data := generateData(size)
-			qf := New(len(data))
+			qf := quickfilter.New(len(data))
 			for i := range data {
 				if data[i].index%2 == 0 {
 					qf = qf.Add(i)
