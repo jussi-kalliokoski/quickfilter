@@ -128,6 +128,33 @@ func Example_union() {
 	fmt.Println(newData)
 }
 
+func Example_intersection() {
+	data := make([]int, 0, 16)
+	for len(data) < cap(data) {
+		data = append(data, len(data))
+	}
+	qf1 := quickfilter.New(len(data))
+	for i := range data {
+		if data[i]%2 == 0 {
+			qf1 = qf1.Add(i)
+		}
+	}
+	qf2 := quickfilter.New(len(data))
+	for i := range data {
+		if data[i]%3 == 0 {
+			qf2 = qf2.Add(i)
+		}
+	}
+	qf := quickfilter.New(len(data))
+	qf = qf.IntersectionOf(qf1, qf2)
+	newData := make([]int, 0, qf.Len())
+	for it := qf.Iterate(); !it.Done(); it = it.Next() {
+		newData = append(newData, data[it.Value()])
+	}
+	// Output: [0 6 12]
+	fmt.Println(newData)
+}
+
 func Benchmark(b *testing.B) {
 	const size = 20000
 
