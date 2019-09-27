@@ -80,6 +80,17 @@ func Test(t *testing.T) {
 			t.Errorf("expected %d, got %d", expectedLen, receivedLen)
 		}
 	})
+
+	t.Run("Cap", func(t *testing.T) {
+		expectedCap := 64
+		qf := quickfilter.New(expectedCap)
+
+		receivedCap := qf.Cap()
+
+		if expectedCap != receivedCap {
+			t.Errorf("expected %d, got %d", expectedCap, receivedCap)
+		}
+	})
 }
 
 func Example() {

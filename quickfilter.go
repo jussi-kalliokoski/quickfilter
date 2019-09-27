@@ -78,6 +78,11 @@ func (qf QuickFilter) Len() int {
 	return qf.len
 }
 
+// Cap returns the maximum number of values that can be stored.
+func (qf QuickFilter) Cap() int {
+	return qf.sourceLen
+}
+
 // Clear the entries in the QuickFilter.
 //
 // The original QuickFilter is no longer usable and must be replaced with the
