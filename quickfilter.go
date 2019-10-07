@@ -73,6 +73,22 @@ func (qf QuickFilter) Add(index int) QuickFilter {
 	return qf
 }
 
+// Delete an index from the offset list.
+//
+// The original QuickFilter is no longer usable and must be replaced with the
+// returned one. This approach prevents the QuickFilter from escaping to the
+// heap.
+func (qf QuickFilter) Delete(index int) QuickFilter {
+	index, mask := offsets(index)
+	oldValue := qf.bits[index]
+	if oldValue&mask == 0 {
+		return qf
+	}
+	qf.bits[index] = oldValue ^ mask
+	qf.len--
+	return qf
+}
+
 // Len returns the number of offsets stored.
 func (qf QuickFilter) Len() int {
 	return qf.len

@@ -91,6 +91,60 @@ func Test(t *testing.T) {
 			t.Errorf("expected %d, got %d", expectedCap, receivedCap)
 		}
 	})
+
+	t.Run("Delete", func(t *testing.T) {
+		t.Run("should decrement len", func(t *testing.T) {
+			qf := quickfilter.New(128)
+			expectedLen := qf.Cap() / 4
+
+			for i := 0; i < qf.Cap(); i += 2 {
+				qf = qf.Add(i)
+			}
+			for i := 0; i < qf.Cap(); i += 4 {
+				qf = qf.Delete(i)
+			}
+			receivedLen := qf.Len()
+
+			if expectedLen != receivedLen {
+				t.Errorf("expected %d, got %d", expectedLen, receivedLen)
+			}
+		})
+
+		t.Run("should make items non-iterable", func(t *testing.T) {
+			qf := quickfilter.New(128)
+			expectedIterated := qf.Cap() / 4
+
+			for i := 0; i < qf.Cap(); i += 2 {
+				qf = qf.Add(i)
+			}
+			for i := 0; i < qf.Cap(); i += 4 {
+				qf = qf.Delete(i)
+			}
+			receivedIterated := 0
+			for it := qf.Iterate(); !it.Done(); it = it.Next() {
+				receivedIterated++
+			}
+
+			if expectedIterated != receivedIterated {
+				t.Errorf("expected %d, got %d", expectedIterated, receivedIterated)
+			}
+		})
+
+		t.Run("double delete should be a no-op", func(t *testing.T) {
+			qf := quickfilter.NewFilled(128)
+			expectedLen := qf.Len() - 2
+
+			qf = qf.Delete(qf.Cap() / 4)
+			qf = qf.Delete(qf.Cap() / 4)
+			qf = qf.Delete(qf.Cap() / 2)
+			qf = qf.Delete(qf.Cap() / 2)
+			receivedLen := qf.Len()
+
+			if expectedLen != receivedLen {
+				t.Errorf("expected %d, got %d", expectedLen, receivedLen)
+			}
+		})
+	})
 }
 
 func Example() {
