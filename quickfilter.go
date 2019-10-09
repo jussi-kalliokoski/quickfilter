@@ -127,10 +127,38 @@ func (qf QuickFilter) Fill() QuickFilter {
 
 // Copy a QuickFilter with its results to a new QuickFilter.
 func (qf QuickFilter) Copy() QuickFilter {
-	qf2 := New(qf.sourceLen)
-	copy(qf2.bits, qf.bits)
-	qf2.len = qf.len
-	return qf2
+	return New(qf.Cap()).CopyFrom(qf)
+}
+
+// CopyFrom copies the set values from an existing QuickFilter.
+//
+// If the two QuickFilters are not of the same Cap(), the receiver will be
+// resized.
+//
+// The original QuickFilter is no longer usable and must be replaced with the
+// returned one. This approach prevents the QuickFilter from escaping to the
+// heap.
+func (qf QuickFilter) CopyFrom(qf2 QuickFilter) QuickFilter {
+	qf = qf.Resize(qf2.Cap())
+	qf.len = qf2.len
+	copy(qf.bits, qf2.bits)
+	return qf
+}
+
+// Resize a QuickFilter to a new source length. Will allocate a new backing
+// buffer if the source length won't fit in the old one.
+//
+// The original QuickFilter is no longer usable and must be replaced with the
+// returned one. This approach prevents the QuickFilter from escaping to the
+// heap.
+func (qf QuickFilter) Resize(sourceLen int) QuickFilter {
+	lastIndex, _ := offsets(sourceLen - 1)
+	bitsLen := lastIndex + 1
+	qf.sourceLen = sourceLen
+	if len(qf.bits) < bitsLen {
+		qf.bits = make([]uint, bitsLen)
+	}
+	return qf
 }
 
 // UnionOf fills the QuickFilter with the set values in one or both of the

@@ -145,6 +145,94 @@ func Test(t *testing.T) {
 			}
 		})
 	})
+
+	t.Run("CopyFrom", func(t *testing.T) {
+		qf1 := quickfilter.NewFilled(128)
+		qf2 := quickfilter.New(qf1.Cap())
+		expectedLen := qf1.Len()
+
+		qf2 = qf2.CopyFrom(qf1)
+		receivedLen := qf2.Len()
+
+		if expectedLen != receivedLen {
+			t.Errorf("expected %d, got %d", expectedLen, receivedLen)
+		}
+	})
+
+	t.Run("Resize", func(t *testing.T) {
+		t.Run("shrink", func(t *testing.T) {
+			expectedCap := 64
+			expectedLen := expectedCap
+			qf := quickfilter.New(expectedCap * 2)
+
+			qf = qf.Resize(expectedCap)
+			qf = qf.Fill()
+			receivedCap := qf.Cap()
+			receivedLen := qf.Cap()
+
+			if expectedLen != receivedLen {
+				t.Errorf("expected %d, got %d", expectedLen, receivedLen)
+			}
+			if expectedCap != receivedCap {
+				t.Errorf("expected %d, got %d", expectedCap, receivedCap)
+			}
+		})
+
+		t.Run("grow", func(t *testing.T) {
+			expectedCap := 128
+			expectedLen := expectedCap
+			qf := quickfilter.New(expectedCap / 2)
+
+			qf = qf.Resize(expectedCap)
+			qf = qf.Fill()
+			receivedCap := qf.Cap()
+			receivedLen := qf.Cap()
+
+			if expectedLen != receivedLen {
+				t.Errorf("expected %d, got %d", expectedLen, receivedLen)
+			}
+			if expectedCap != receivedCap {
+				t.Errorf("expected %d, got %d", expectedCap, receivedCap)
+			}
+		})
+
+		t.Run("noop", func(t *testing.T) {
+			expectedCap := 128
+			expectedLen := expectedCap
+			qf := quickfilter.New(expectedCap)
+
+			qf = qf.Resize(expectedCap)
+			qf = qf.Fill()
+			receivedCap := qf.Cap()
+			receivedLen := qf.Cap()
+
+			if expectedLen != receivedLen {
+				t.Errorf("expected %d, got %d", expectedLen, receivedLen)
+			}
+			if expectedCap != receivedCap {
+				t.Errorf("expected %d, got %d", expectedCap, receivedCap)
+			}
+		})
+
+		t.Run("shrink & grow", func(t *testing.T) {
+			expectedCap := 128
+			expectedLen := expectedCap
+			qf := quickfilter.New(expectedCap)
+
+			qf = qf.Resize(expectedCap / 2)
+			qf = qf.Resize(expectedCap)
+			qf = qf.Fill()
+			receivedCap := qf.Cap()
+			receivedLen := qf.Cap()
+
+			if expectedLen != receivedLen {
+				t.Errorf("expected %d, got %d", expectedLen, receivedLen)
+			}
+			if expectedCap != receivedCap {
+				t.Errorf("expected %d, got %d", expectedCap, receivedCap)
+			}
+		})
+	})
 }
 
 func Example() {
