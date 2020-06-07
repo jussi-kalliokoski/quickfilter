@@ -232,6 +232,40 @@ func Test(t *testing.T) {
 				t.Errorf("expected %d, got %d", expectedCap, receivedCap)
 			}
 		})
+
+		t.Run("should not break batch operations", func(t *testing.T) {
+			t.Run("grow", func(t *testing.T) {
+				oldCap := 60
+				expectedCap := 128
+				qf1 := quickfilter.New(oldCap)
+				qf2 := quickfilter.New(expectedCap)
+
+				qf1 = qf1.Resize(expectedCap)
+				qf1 = qf1.IntersectionOf(qf1, qf2)
+				qf2 = qf2.UnionOf(qf1, qf2)
+				receivedCap := qf1.Cap()
+
+				if expectedCap != receivedCap {
+					t.Errorf("expected %d, got %d", expectedCap, receivedCap)
+				}
+			})
+
+			t.Run("shrink", func(t *testing.T) {
+				oldCap := 128
+				expectedCap := 60
+				qf1 := quickfilter.New(oldCap)
+				qf2 := quickfilter.New(expectedCap)
+
+				qf1 = qf1.Resize(expectedCap)
+				qf1 = qf1.IntersectionOf(qf1, qf2)
+				qf2 = qf2.UnionOf(qf1, qf2)
+				receivedCap := qf1.Cap()
+
+				if expectedCap != receivedCap {
+					t.Errorf("expected %d, got %d", expectedCap, receivedCap)
+				}
+			})
+		})
 	})
 }
 

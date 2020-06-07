@@ -155,8 +155,10 @@ func (qf QuickFilter) Resize(sourceLen int) QuickFilter {
 	lastIndex, _ := offsets(sourceLen - 1)
 	bitsLen := lastIndex + 1
 	qf.sourceLen = sourceLen
-	if len(qf.bits) < bitsLen {
+	if cap(qf.bits) < bitsLen {
 		qf.bits = make([]uint, bitsLen)
+	} else {
+		qf.bits = qf.bits[:bitsLen]
 	}
 	return qf
 }
