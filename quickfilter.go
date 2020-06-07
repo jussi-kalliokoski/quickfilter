@@ -234,6 +234,12 @@ func (it Iterator) Next() Iterator {
 		if it.bits[index]&mask > 0 {
 			return it
 		}
+		if it.bits[index] == 0 {
+			// fast path for empty words
+			index++
+			it.index = index * bits.UintSize
+			continue
+		}
 		it.index++
 	}
 	return it
