@@ -81,6 +81,28 @@ func Test(t *testing.T) {
 		}
 	})
 
+	t.Run("Has", func(t *testing.T) {
+		t.Run("found", func(t *testing.T) {
+			qf := quickfilter.New(24).Add(12)
+
+			found := qf.Has(12)
+
+			if !found {
+				t.Error("expected Has to return true")
+			}
+		})
+
+		t.Run("not found", func(t *testing.T) {
+			qf := quickfilter.New(24).Add(12)
+
+			found := qf.Has(11)
+
+			if found {
+				t.Error("expected Has to return false")
+			}
+		})
+	})
+
 	t.Run("Cap", func(t *testing.T) {
 		expectedCap := 64
 		qf := quickfilter.New(expectedCap)

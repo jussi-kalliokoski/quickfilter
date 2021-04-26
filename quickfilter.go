@@ -205,6 +205,13 @@ func (qf QuickFilter) IntersectionOf(qf1, qf2 QuickFilter) QuickFilter {
 	return qf
 }
 
+// Has returns a boolean indicating whether the QuickFilter has the bit at
+// given index set.
+func (qf QuickFilter) Has(index int) bool {
+	wordIndex, mask := offsets(index)
+	return qf.bits[wordIndex]&mask > 0
+}
+
 // Iterate over the stored offsets.
 func (qf QuickFilter) Iterate() Iterator {
 	return Iterator{
