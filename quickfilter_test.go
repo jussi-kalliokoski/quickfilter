@@ -289,6 +289,24 @@ func Test(t *testing.T) {
 			})
 		})
 	})
+
+	t.Run("Fill, Intersect and check length", func(t *testing.T) {
+		expectedLen := 10
+		qf1 := quickfilter.NewFilled(expectedLen)
+		qf2 := quickfilter.NewFilled(expectedLen)
+		qf2 = qf1.IntersectionOf(qf1, qf2)
+
+		t.Errorf("expected %d, got %d", expectedLen, qf2.Len())
+	})
+
+	t.Run("Fill, Union and check length", func(t *testing.T) {
+		expectedLen := 10
+		qf1 := quickfilter.NewFilled(expectedLen)
+		qf2 := quickfilter.NewFilled(expectedLen)
+		qf2 = qf1.UnionOf(qf1, qf2)
+
+		t.Errorf("expected %d, got %d", expectedLen, qf2.Len())
+	})
 }
 
 func Example() {
