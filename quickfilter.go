@@ -276,10 +276,10 @@ func offsets(pos int) (index int, mask uint) {
 //
 // First we reverse the word and shift by the number of unused bits,
 // then we reverse back to have the word with unused bits set to zeros.
-func onesCountLastWord(word uint, usedBits int) int {
+func onesCountLastWord(word uint, usedBitsCount int) int {
 	return bits.OnesCount(
 		bits.Reverse(
-			bits.Reverse(word) << uint(bits.UintSize - usedBits),
+			bits.Reverse(word) << uint(bits.UintSize - usedBitsCount),
 		),
 	)
 }
