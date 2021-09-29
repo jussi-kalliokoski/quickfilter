@@ -179,7 +179,12 @@ func (qf QuickFilter) UnionOf(qf1, qf2 QuickFilter) QuickFilter {
 	qf.len = 0
 	for i := range qf.bits {
 		qf.bits[i] = qf1.bits[i] | qf2.bits[i]
-		qf.len += bits.OnesCount(qf.bits[i])
+
+		if i == len(qf.bits) - 1 {
+			qf.len += onesCountLastWord(qf.bits[i], qf.sourceLen % bits.UintSize)
+		} else {
+			qf.len += bits.OnesCount(qf.bits[i])
+		}
 	}
 	return qf
 }
@@ -200,7 +205,12 @@ func (qf QuickFilter) IntersectionOf(qf1, qf2 QuickFilter) QuickFilter {
 	qf.len = 0
 	for i := range qf.bits {
 		qf.bits[i] = qf1.bits[i] & qf2.bits[i]
-		qf.len += bits.OnesCount(qf.bits[i])
+
+		if i == len(qf.bits) - 1 {
+			qf.len += onesCountLastWord(qf.bits[i], qf.sourceLen % bits.UintSize)
+		} else {
+			qf.len += bits.OnesCount(qf.bits[i])
+		}
 	}
 	return qf
 }
@@ -259,4 +269,17 @@ func (it Iterator) Value() int {
 
 func offsets(pos int) (index int, mask uint) {
 	return pos / bits.UintSize, 1 << (uint(pos) % bits.UintSize)
+}
+
+// onesCountLastWord returns the number of onces bits in the word
+// taking into account the number of bits used.
+//
+// First we reverse the word and shift by the number of unused bits,
+// then we reverse back to have the word with unused bits set to zeros.
+func onesCountLastWord(word uint, usedBits int) int {
+	return bits.OnesCount(
+		bits.Reverse(
+			bits.Reverse(word) << uint(bits.UintSize - usedBits),
+		),
+	)
 }
