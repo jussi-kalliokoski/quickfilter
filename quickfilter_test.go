@@ -296,7 +296,10 @@ func Test(t *testing.T) {
 		qf2 := quickfilter.NewFilled(expectedLen)
 		qf2 = qf1.IntersectionOf(qf1, qf2)
 
-		t.Errorf("expected %d, got %d", expectedLen, qf2.Len())
+		got := qf2.Len()
+		if expectedLen != got {
+			t.Errorf("expected %d, got %d", expectedLen, got)
+		}
 	})
 
 	t.Run("Fill, Union and check length", func(t *testing.T) {
@@ -305,7 +308,10 @@ func Test(t *testing.T) {
 		qf2 := quickfilter.NewFilled(expectedLen)
 		qf2 = qf1.UnionOf(qf1, qf2)
 
-		t.Errorf("expected %d, got %d", expectedLen, qf2.Len())
+		got := qf2.Len()
+		if expectedLen != got {
+			t.Errorf("expected %d, got %d", expectedLen, got)
+		}
 	})
 }
 
