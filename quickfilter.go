@@ -271,7 +271,7 @@ func offsets(pos int) (index int, mask uint) {
 	return pos / bits.UintSize, 1 << (uint(pos) % bits.UintSize)
 }
 
-// onesCountLastWord returns the number of onces bits in the word
+// onesCountLastWord returns the number of onces in the word
 // taking into account the number of bits used.
 //
 // First we reverse the word and shift by the number of unused bits,
