@@ -177,7 +177,7 @@ func (qf QuickFilter) UnionOf(qf1, qf2 QuickFilter) QuickFilter {
 		panic("receiver and passed QuickFilters must be the same size")
 	}
 	qf.len = 0
-	for i := 0; i < len(qf.bits) - 1; i++ {
+	for i := range qf.bits[:len(qf.bits)-1] {
 		qf.bits[i] = qf1.bits[i] | qf2.bits[i]
 		qf.len += bits.OnesCount(qf.bits[i])
 	}
@@ -203,7 +203,7 @@ func (qf QuickFilter) IntersectionOf(qf1, qf2 QuickFilter) QuickFilter {
 		panic("receiver and passed QuickFilters must be the same size")
 	}
 	qf.len = 0
-	for i := 0; i < len(qf.bits) - 1; i++ {
+	for i := range qf.bits[:len(qf.bits)-1] {
 		qf.bits[i] = qf1.bits[i] & qf2.bits[i]
 		qf.len += bits.OnesCount(qf.bits[i])
 	}
