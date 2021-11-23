@@ -178,7 +178,7 @@ func (qf QuickFilter) UnionOf(qf1, qf2 QuickFilter) QuickFilter {
 	}
 	qf.len = 0
 	fullWords := len(qf.bits)
-	if qf.sourceLen%bits.UintSize > 0 {
+	if qf.sourceLen % bits.UintSize > 0 {
 		fullWords = fullWords - 1
 	}
 
@@ -209,7 +209,7 @@ func (qf QuickFilter) IntersectionOf(qf1, qf2 QuickFilter) QuickFilter {
 	}
 	qf.len = 0
 	fullWords := len(qf.bits)
-	if qf.sourceLen%bits.UintSize > 0 {
+	if qf.sourceLen % bits.UintSize > 0 {
 		fullWords = fullWords - 1
 	}
 
