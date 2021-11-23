@@ -177,14 +177,19 @@ func (qf QuickFilter) UnionOf(qf1, qf2 QuickFilter) QuickFilter {
 		panic("receiver and passed QuickFilters must be the same size")
 	}
 	qf.len = 0
-	for i := range qf.bits[:len(qf.bits)-1] {
+	fullWords := len(qf.bits)
+	if qf.sourceLen%bits.UintSize > 0 {
+		fullWords = fullWords - 1
+	}
+
+	for i := range qf.bits[:fullWords] {
 		qf.bits[i] = qf1.bits[i] | qf2.bits[i]
 		qf.len += bits.OnesCount(qf.bits[i])
 	}
 
 	i := len(qf.bits) - 1
 	qf.bits[i] = qf1.bits[i] | qf2.bits[i]
-	qf.len += onesCountLastWord(qf.bits[i], qf.sourceLen % bits.UintSize)
+	qf.len += onesCountLastWord(qf.bits[i], qf.sourceLen%bits.UintSize)
 
 	return qf
 }
@@ -203,14 +208,19 @@ func (qf QuickFilter) IntersectionOf(qf1, qf2 QuickFilter) QuickFilter {
 		panic("receiver and passed QuickFilters must be the same size")
 	}
 	qf.len = 0
-	for i := range qf.bits[:len(qf.bits)-1] {
+	fullWords := len(qf.bits)
+	if qf.sourceLen%bits.UintSize > 0 {
+		fullWords = fullWords - 1
+	}
+
+	for i := range qf.bits[:fullWords] {
 		qf.bits[i] = qf1.bits[i] & qf2.bits[i]
 		qf.len += bits.OnesCount(qf.bits[i])
 	}
 
 	i := len(qf.bits) - 1
 	qf.bits[i] = qf1.bits[i] & qf2.bits[i]
-	qf.len += onesCountLastWord(qf.bits[i], qf.sourceLen % bits.UintSize)
+	qf.len += onesCountLastWord(qf.bits[i], qf.sourceLen%bits.UintSize)
 
 	return qf
 }
@@ -276,5 +286,5 @@ func offsets(pos int) (index int, mask uint) {
 //
 // We shift by the number of unused bits to have only first usedBitsCount bits left and then count.
 func onesCountLastWord(word uint, usedBitsCount int) int {
-	return bits.OnesCount(word << uint(bits.UintSize - usedBitsCount))
+	return bits.OnesCount(word << uint(bits.UintSize-usedBitsCount))
 }
