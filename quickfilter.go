@@ -273,6 +273,8 @@ func offsets(pos int) (index int, mask uint) {
 
 // onesCountLastWord returns the number of onces in the word
 // taking into account the number of bits used.
+// if sourceLen % bits.UintSize == 0 then the number of bits used is bits.UintSize,
+// meaning that all bits are used in the last word
 //
 // We shift by the number of unused bits to have only first usedBitsCount bits left and then count.
 func onesCountLastWord(word uint, sourceLen int) int {
