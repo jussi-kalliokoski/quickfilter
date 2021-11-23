@@ -184,7 +184,7 @@ func (qf QuickFilter) UnionOf(qf1, qf2 QuickFilter) QuickFilter {
 
 	i := len(qf.bits) - 1
 	qf.bits[i] = qf1.bits[i] | qf2.bits[i]
-	qf.len += onesCountLastWord(qf.bits[i], qf.sourceLen % bits.UintSize)
+	qf.len += onesCountLastWord(qf.bits[i], qf.sourceLen)
 
 	return qf
 }
@@ -210,7 +210,7 @@ func (qf QuickFilter) IntersectionOf(qf1, qf2 QuickFilter) QuickFilter {
 
 	i := len(qf.bits) - 1
 	qf.bits[i] = qf1.bits[i] & qf2.bits[i]
-	qf.len += onesCountLastWord(qf.bits[i], qf.sourceLen % bits.UintSize)
+	qf.len += onesCountLastWord(qf.bits[i], qf.sourceLen)
 
 	return qf
 }
@@ -275,6 +275,10 @@ func offsets(pos int) (index int, mask uint) {
 // taking into account the number of bits used.
 //
 // We shift by the number of unused bits to have only first usedBitsCount bits left and then count.
-func onesCountLastWord(word uint, usedBitsCount int) int {
-	return bits.OnesCount(word << uint(bits.UintSize - usedBitsCount))
+func onesCountLastWord(word uint, sourceLen int) int {
+	countOfBitsInLastWord := sourceLen % bits.UintSize
+	if countOfBitsInLastWord == 0 {
+		countOfBitsInLastWord = bits.UintSize
+	}
+	return bits.OnesCount(word << uint(bits.UintSize - countOfBitsInLastWord))
 }
